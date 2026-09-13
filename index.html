@@ -2,138 +2,188 @@
 <html lang="sk">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chladni Patterns Real-time Simulator</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <title>Chladniho Útvary a Živá Rovnica</title>
+    <!-- Načítanie p5.js knižnice pre grafiku -->
+    <script src="https://cloudflare.com"></script>
     <style>
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #111;
-            color: #eee;
-            margin: 0;
-            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1e1e24;
+            color: #f5f5f7;
             display: flex;
             flex-direction: column;
             align-items: center;
+            padding: 20px;
+            margin: 0;
         }
-        h1 { margin-bottom: 10px; font-size: 24px; color: #fff; }
+        h1 { margin-bottom: 5px; color: #4dadff; }
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+            max-width: 1000px;
+        }
         .controls {
-            background: #222;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            display: grid;
-            grid-template-columns: auto 1fr auto;
-            gap: 10px 15px;
-            align-items: center;
+            background-color: #2a2a35;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            min-width: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .slider-group {
+            margin-bottom: 18px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        input[type=range] {
             width: 100%;
-            max-width: 500px;
         }
-        label { font-weight: bold; font-size: 14px; }
-        input[type=range] { width: 100%; }
-        span { font-variant-numeric: tabular-nums; font-size: 14px; width: 30px; text-align: right; }
+        .value-display {
+            color: #4dadff;
+            font-weight: bold;
+        }
         #canvas-container {
-            border: 2px solid #444;
-            border-radius: 4px;
+            border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
         }
-        .info {
-            margin-top: 15px;
-            font-size: 12px;
-            color: #888;
-            max-width: 500px;
+        .equation-box {
+            background-color: #141419;
+            border-left: 5px solid #4dadff;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 25px;
+            width: 100%;
+            max-width: 800px;
+            box-sizing: border-box;
             text-align: center;
-            line-height: 1.4;
+        }
+        .equation-text {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 1.3rem;
+            color: #00ffcc;
+            word-wrap: break-word;
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
 
-    <h1>Chladniho Vzorce (Real-time)</h1>
-    
-    <div class="controls">
-        <label for="n-slider">Mód n:</label>
-        <input type="range" id="n-slider" min="1" max="15" step="1" value="2">
-        <span id="n-val">2</span>
-        
-        <label for="m-slider">Mód m:</label>
-        <input type="range" id="m-slider" min="1" max="15" step="1" value="7">
-        <span id="m-val">7</span>
-        
-        <label for="a-slider">Váha a:</label>
-        <input type="range" id="a-slider" min="-1" max="1" step="0.1" value="1">
-        <span id="a-val">1.0</span>
-        
-        <label for="b-slider">Váha b:</label>
-        <input type="range" id="b-slider" min="-1" max="1" step="0.1" value="1">
-        <span id="b-val">1.0</span>
+    <h1>Interaktívne Chladniho Útvary</h1>
+    <p>Hýbte posuvníkmi a sledujte interferenciu stojatých vĺn a živý prepočet rovnice.</p>
+
+    <div class="container">
+        <!-- Miesto pre grafické okno -->
+        <div id="canvas-container"></div>
+
+        <!-- Ovládacie prvky -->
+        <div class="controls">
+            <div class="slider-group">
+                <label>Mód n (vlny na osi X): <span id="n-val" class="value-display">2</span></label>
+                <input type="range" id="slider-n" min="1" max="15" step="1" value="2">
+            </div>
+            
+            <div class="slider-group">
+                <label>Mód m (vlny na osi Y): <span id="m-val" class="value-display">5</span></label>
+                <input type="range" id="slider-m" min="1" max="15" step="1" value="5">
+            </div>
+
+            <div class="slider-group">
+                <label>Amplitúda a: <span id="a-val" class="value-display">1.0</span></label>
+                <input type="range" id="slider-a" min="-2" max="2" step="0.1" value="1.0">
+            </div>
+
+            <div class="slider-group">
+                <label>Amplitúda b: <span id="b-val" class="value-display">1.0</span></label>
+                <input type="range" id="slider-b" min="-2" max="2" step="0.1" value="1.0">
+            </div>
+        </div>
     </div>
 
-    <div id="canvas-container"></div>
-    
-    <div class="info">
-        Rovnica: W(x, y) = a * sin(nπx) * sin(mπy) + b * sin(mπx) * sin(nπy) <br>
-        Svetlé línie znázorňujú miesta (uzly), kde je kmitanie nulové a usadzuje sa tam piesok.
+    <!-- Živý výpočet rovnice -->
+    <div class="equation-box">
+        <strong>Aktuálna vypočítaná rovnica uzlových línií W(x, y) = 0:</strong>
+        <div id="equation" class="equation-text">W(x, y) = ...</div>
     </div>
 
     <script>
-        let nSlider, mSlider, aSlider, bSlider;
-        let nVal, mVal, aVal, bVal;
-        const size = 400;
+        let L = 400; // Veľkosť plátna
+        let sliderN, sliderM, sliderA, sliderB;
 
         function setup() {
-            const canvas = createCanvas(size, size);
+            let canvas = createCanvas(L, L);
             canvas.parent('canvas-container');
-            pixelDensity(1);
-            
-            nSlider = select('#n-slider');
-            mSlider = select('#m-slider');
-            aSlider = select('#a-slider');
-            bSlider = select('#b-slider');
-            
-            nVal = select('#n-val');
-            mVal = select('#m-val');
-            aVal = select('#a-val');
-            bVal = select('#b-val');
+            pixelDensity(1); // Rýchlejšie vykresľovanie pixelov
+
+            // Prepojenie HTML posuvníkov s p5.js
+            sliderN = select('#slider-n');
+            sliderM = select('#slider-m');
+            sliderA = select('#slider-a');
+            sliderB = select('#slider-b');
         }
 
         function draw() {
-            let n = float(nSlider.value());
-            let m = float(mSlider.value());
-            let a = float(aSlider.value());
-            let b = float(bSlider.value());
-            
-            nVal.html(n);
-            mVal.html(m);
-            aVal.html(a.toFixed(1));
-            bVal.html(b.toFixed(1));
+            let n = parseInt(sliderN.value());
+            let m = parseInt(sliderM.value());
+            let a = parseFloat(sliderA.value());
+            let b = parseFloat(sliderB.value());
 
+            // Aktualizácia čísel v textoch pri posuvníkoch
+            select('#n-val').html(n);
+            select('#m-val').html(m);
+            select('#a-val').html(a.toFixed(1));
+            select('#b-val').html(b.toFixed(1));
+
+            // ŽIVÝ PREPOČET TEXTU ROVNICE
+            updateEquationText(n, m, a, b);
+
+            // Vykreslenie Chladniho vzorca na pixely plátna
             loadPixels();
-            
-            for (let y = 0; y < height; y++) {
-                for (let x = 0; x < width; x++) {
-                    // Normalizácia súradníc na rozsah 0 až 1
-                    let nx = x / width;
-                    let ny = y / height;
+            for (let x = 0; x < L; x++) {
+                for (let y = 0; y < L; y++) {
+                    // Normalizácia súradníc na rozsah 0 až PI (pre zjednodušenie rovnice na plátne)
+                    let xCoord = (x / L) * Math.PI;
+                    let yCoord = (y / L) * Math.PI;
+
+                    // Základná rovnica stojatých vĺn Chladniho platne
+                    let W = a * Math.sin(n * xCoord) * Math.sin(m * yCoord) + 
+                            b * Math.sin(m * xCoord) * Math.sin(n * yCoord);
+
+                    // Hľadáme miesta blízke nule (uzlové línie, kde sa usádza piesok)
+                    let intensity = Math.abs(W);
                     
-                    // Výpočet Chladniho rovnice
-                    let w = a * sin(n * PI * nx) * sin(m * PI * ny) + b * sin(m * PI * nx) * sin(n * PI * ny);
-                    
-                    // Čím bližšie k nule (uzol), tým svetlejšia farba (piesok)
-                    let absW = abs(w);
-                    let intensity = map(absW, 0, 0.2, 255, 0, true);
-                    
-                    // Nastavenie farby pixelu (medený/pieskový odtieň)
-                    let index = (x + y * width) * 4;
-                    pixels[index] = intensity;       // R
-                    pixels[index + 1] = intensity * 0.7; // G
-                    pixels[index + 2] = intensity * 0.4; // B
-                    pixels[index + 3] = 255;             // A
+                    // Prepočítanie na farbu: čím bližšie k nule, tým tmavšia/ostrejšia linka (piesok)
+                    // Zvyšok platne simuluje vibrácie (svetlá farba)
+                    let c = Math.min(255, intensity * 200);
+
+                    // Nastavenie farby pixelu (zlatisto-medený efekt piesku)
+                    let index = (x + y * L) * 4;
+                    pixels[index] = c + 40;     // Červená zložka
+                    pixels[index+1] = c + 20;   // Zelená zložka
+                    pixels[index+2] = c;        // Modrá zložka
+                    pixels[index+3] = 255;      // Alfa kanál (priehľadnosť)
                 }
             }
-            
             updatePixels();
+        }
+
+        // Pomocná funkcia, ktorá formátuje text rovnice podľa znamienok a hodnôt
+        function updateEquationText(n, m, a, b) {
+            let part1 = `${a.toFixed(1)} · sin(${n}x) · sin(${m}y)`;
+            let sign = b >= 0 ? " + " : " - ";
+            let part2 = `${Math.abs(b).toFixed(1)} · sin(${m}x) · sin(${n}y)`;
+            
+            let fullEq = `${part1}${sign}${part2} = 0`;
+            select('#equation').html(fullEq);
         }
     </script>
 </body>
